@@ -20,5 +20,11 @@
 		"obsidian": "latest",
 		"tslib": "2.4.0",
 		"typescript": "4.7.4"
+	},
+	"dependencies": {
+		"@notion-stuff/v4-types": "^6.0.0",
+		"@notionhq/client": "^2.0.0",
+		"node-fetch": "2.x",
+		"notion-to-md": "^2.5.1"
 	}
 }

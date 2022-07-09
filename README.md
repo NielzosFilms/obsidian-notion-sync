@@ -1,6 +1,6 @@
-# Obsidian Notion Download
+# Obsidian Notion Sync
 
-This plugin will download all the pages from a Notion table
+This plugin will sync all the pages from a Notion table
 
 ## Setup
 

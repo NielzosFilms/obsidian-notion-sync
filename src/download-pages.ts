@@ -6,21 +6,20 @@ import { NotionToMarkdown } from "notion-to-md";
 
 import { Client } from "@notionhq/client";
 
-interface SimpleMarkdownPage {
-	title: string;
-	id: string;
-	content: string;
-}
+import { SimpleMarkdownPage, NotionService } from "./notion-service";
 
 export class DownloadFromNotion {
 	app: MyPlugin;
+	notionService: NotionService;
 
 	constructor(app: MyPlugin) {
 		this.app = app;
+		this.notionService = new NotionService(this.app);
 	}
 
 	public async downloadPages() {
-		const pages = await this.getPages();
+		const pages = await this.notionService.getPages();
+		if (!pages) return;
 		const markdownPages: SimpleMarkdownPage[] = [];
 
 		const parser = new NotionToMarkdown({ notionClient: new Client() });
@@ -28,7 +27,8 @@ export class DownloadFromNotion {
 		await Promise.all(
 			// Use map instead of foreach to do this in parallel
 			pages.map(async (page) => {
-				const blocks = await this.getPageBlocks(page.id);
+				const blocks = await this.notionService.getPageBlocks(page.id);
+				if (!blocks) return;
 
 				markdownPages.push({
 					title: page.properties.Name.title[0].plain_text,
@@ -75,43 +75,5 @@ notion-url: [${mdPage.title}](https://www.notion.so/${
 
 ---
 `;
-	}
-
-	private async getPages(): Promise<any[]> {
-		const bodyString: any = {
-			page_size: 100,
-		};
-		const response = await requestUrl({
-			url: `https://api.notion.com/v1/databases/${this.app.settings.databaseID}/query`,
-			method: "POST",
-			headers: {
-				Accept: "application/json",
-				// 'User-Agent': 'obsidian.md',
-				Authorization: "Bearer " + this.app.settings.notionAPI,
-				"Notion-Version": "2021-08-16",
-			},
-			body: JSON.stringify(bodyString),
-		});
-		return response.json.results;
-	}
-
-	private async getPageBlocks(pageId: string): Promise<Blocks> {
-		const response = await requestUrl({
-			url: `https://api.notion.com/v1/blocks/${pageId}/children?page_size=100`,
-			method: "GET",
-			headers: {
-				Accept: "application/json",
-				// 'User-Agent': 'obsidian.md',
-				Authorization: "Bearer " + this.app.settings.notionAPI,
-				"Notion-Version": "2021-08-16",
-			},
-		});
-		return response.json.results.map((block: any) => {
-			// after a lot of searching in the types I fount out that this is not mapped correctly :angry:
-			if (block[block.type]?.text) {
-				block[block.type].rich_text = block[block.type].text;
-			}
-			return block;
-		}) as Blocks;
 	}
 }

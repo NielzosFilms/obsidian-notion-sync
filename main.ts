@@ -58,6 +58,7 @@ export default class MyPlugin extends Plugin {
 			id: "sync-notes",
 			name: "Sync notes",
 			callback: () => {
+				console.log("start sync");
 				const downloader = new DownloadFromNotion(this);
 				downloader.downloadPages();
 				// new SampleModal(this.app).open();

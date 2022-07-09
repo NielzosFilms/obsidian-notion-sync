@@ -14,7 +14,6 @@ interface SimpleMarkdownPage {
 
 export class DownloadFromNotion {
 	app: MyPlugin;
-	agent: any;
 
 	constructor(app: MyPlugin) {
 		this.app = app;
